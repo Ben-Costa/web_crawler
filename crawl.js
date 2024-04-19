@@ -1,3 +1,4 @@
+const { JSDOM } = require('jsdom')
 //Strip out and normalize domain from website string
 function normalizeURL(urlString) {
     const urlObj = new URL(urlString)
@@ -8,6 +9,17 @@ function normalizeURL(urlString) {
     return hostPath
 }   
 
+function getURLsFromHTML(htmlBody, baseURL){
+    const urls = []
+    const dom = new JSDOM(htmlBody)
+    const linkElements = dom.window.document.querySelectorAll('a')
+    for (const linkElement of linkElements){
+        urls.push(linkElement.href)
+    }
+    return urls
+}
+
 module.exports ={
-    normalizeURL
+    normalizeURL,
+    getURLsFromHTML
 }
