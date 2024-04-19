@@ -1,0 +1,15 @@
+{
+  "name": "web_crawler",
+  "version": "1.0.0",
+  "description": "Web scrawler from https://www.youtube.com/watch?v=2JYT5f2isg4",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node main.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
