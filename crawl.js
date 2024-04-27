@@ -1,5 +1,13 @@
 const { JSDOM } = require('jsdom')
 
+//todo
+//1. get recurssive code to work
+//2. test external website
+//3. add in time delay
+//4. add in limit for how deep
+//5. add in nested display
+
+
 async function crawlPage(currentURL){
     console.log('Crawling: ' + currentURL)
     try{
@@ -15,6 +23,17 @@ async function crawlPage(currentURL){
         if(!contentType.includes("text/html")){
             console.log("non-html response: " + contentType+ " for: "+ currentURL)
             return
+        }
+
+        url_list = getURLsFromHTML(resp)
+
+        for(item in url_list){
+            normalized_url = normalizeURL(item)
+            if(normalized_url.split('/')[0] === baseURL){
+                crawlPage(item)
+            }else{
+                console.log('External link: ' + item)
+            }
         }
 
     }catch(err){
