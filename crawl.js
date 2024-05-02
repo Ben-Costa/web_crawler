@@ -8,36 +8,51 @@ const { JSDOM } = require('jsdom')
 //5. add in nested display
 
 
-async function crawlPage(currentURL){
+async function crawlPage(baseURL, currentURL, pages){
+    
+    console.log(currentURL)
+    const baseURLObj = new URL(baseURL)
+    const currentURLObj = new URL(currentURL)
+
+    if( baseURLObj.hostname !== currentURLObj.hostname){
+        return pages
+    }
+
+    const normalizedCurrentURL = normalizeURL(currentURL)
+    if(pages[normalizedCurrentURL] > 0){
+        pages[normalizedCurrentURL]++
+        return pages
+    }
+
+    pages[normalizedCurrentURL] = 1
+
     console.log('Crawling: ' + currentURL)
+    let htmlBody = ""
     try{
         const resp = await fetch(currentURL)
-        console.log(await resp.text())
 
         if(resp.status > 399){
             console.log("Error with fetch, code: " + resp.status + "for page: " + currentURL)
-            return
+            return pages
         }
 
         const contentType = resp.headers.get("content-type")
         if(!contentType.includes("text/html")){
             console.log("non-html response: " + contentType+ " for: "+ currentURL)
-            return
+            return pages
         }
-
-        url_list = getURLsFromHTML(resp)
-
-        for(item in url_list){
-            normalized_url = normalizeURL(item)
-            if(normalized_url.split('/')[0] === baseURL){
-                crawlPage(item)
-            }else{
-                console.log('External link: ' + item)
-            }
+        
+        htmlBody = await resp.text()
+        const url_list = getURLsFromHTML(htmlBody, baseURL)
+        console.log(url_list)
+        for(const newxtURL of url_list){
+            pages = await crawlPage(baseURL, newxtURL, pages)
         }
+        
+        return pages
 
     }catch(err){
-        console.log("error fetching: "+ currentURL )
+        console.log(err)
     }
 
 }
